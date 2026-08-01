@@ -13,6 +13,11 @@ export async function fetchAdminProductsRequest(): Promise<Product[]> {
   return data
 }
 
+export async function fetchProductByIdRequest(productId: string): Promise<Product> {
+  const { data } = await httpService.get<Product>(apiPaths.productDetail(productId))
+  return data
+}
+
 export interface ProductWritePayload {
   sku: string
   name: string

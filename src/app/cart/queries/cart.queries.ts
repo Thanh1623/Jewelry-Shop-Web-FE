@@ -1,7 +1,11 @@
 import { queryOptions } from "@tanstack/react-query"
 
 import { fetchCartRequest } from "../services/cart.service"
-import { fetchOrderRequest, fetchOrdersRequest } from "../services/order.service"
+import {
+  fetchAdminOrdersRequest,
+  fetchOrderRequest,
+  fetchOrdersRequest,
+} from "../services/order.service"
 import { cartKeys, orderKeys } from "./cart.keys"
 
 export function cartQueryOptions(enabled = true) {
@@ -26,5 +30,13 @@ export function orderDetailQueryOptions(orderId: string, enabled = true) {
     queryKey: orderKeys.detail(orderId),
     queryFn: () => fetchOrderRequest(orderId),
     enabled: enabled && Boolean(orderId),
+  })
+}
+
+export function adminOrdersQueryOptions() {
+  return queryOptions({
+    queryKey: orderKeys.adminList(),
+    queryFn: fetchAdminOrdersRequest,
+    staleTime: 10_000,
   })
 }

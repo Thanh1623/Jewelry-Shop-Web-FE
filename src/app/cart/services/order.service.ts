@@ -1,7 +1,17 @@
 import { apiPaths } from "@/constants/apiPaths"
 import { httpService } from "@/services/httpService"
 
-import type { Order } from "../types/cart.types"
+import type { Order, OrderStatus } from "../types/cart.types"
+
+export interface ShippingPayload {
+  shippingName?: string
+  shippingPhone?: string
+  shippingAddress?: string
+}
+
+export interface CreateOrderFromQuotePayload extends ShippingPayload {
+  messageId: string
+}
 
 export async function fetchOrdersRequest(): Promise<Order[]> {
   const { data } = await httpService.get<Order[]>(apiPaths.orders)
@@ -13,8 +23,30 @@ export async function fetchOrderRequest(orderId: string): Promise<Order> {
   return data
 }
 
-export async function checkoutRequest(): Promise<Order> {
-  const { data } = await httpService.post<Order>(apiPaths.ordersCheckout)
+export async function checkoutRequest(payload?: ShippingPayload): Promise<Order> {
+  const { data } = await httpService.post<Order>(apiPaths.ordersCheckout, payload)
+  return data
+}
+
+export async function createOrderFromQuoteRequest(
+  payload: CreateOrderFromQuotePayload
+): Promise<Order> {
+  const { data } = await httpService.post<Order>(apiPaths.ordersFromQuote, payload)
+  return data
+}
+
+export async function fetchAdminOrdersRequest(): Promise<Order[]> {
+  const { data } = await httpService.get<Order[]>(apiPaths.ordersAdminAll)
+  return data
+}
+
+export async function updateOrderStatusRequest(
+  orderId: string,
+  status: OrderStatus
+): Promise<Order> {
+  const { data } = await httpService.patch<Order>(apiPaths.orderStatus(orderId), {
+    status,
+  })
   return data
 }
 

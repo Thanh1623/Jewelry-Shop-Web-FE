@@ -5,9 +5,10 @@ import { toast } from "sonner"
 import { urlPaths } from "@/constants/urlPaths"
 import { getApiErrorMessage } from "@/lib/get-api-error-message"
 
-import { createSessionRequest, postMessageRequest } from "../services/chat.service"
+import { createQuoteRequest, createSessionRequest, postMessageRequest } from "../services/chat.service"
 import type {
   ChatSessionDetail,
+  CreateQuotePayload,
   CreateSessionPayload,
   HumanMessageSender,
   SendMessagePayload,
@@ -44,6 +45,23 @@ export function useSendMessageMutation(sessionId: string, sender: HumanMessageSe
     },
     onError: (error) => {
       toast.error(getApiErrorMessage(error, "Không thể gửi tin nhắn."))
+    },
+  })
+}
+
+export function useCreateQuoteMutation(sessionId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: CreateQuotePayload) => createQuoteRequest(sessionId, payload),
+    onSuccess: (message) => {
+      queryClient.setQueryData(chatKeys.session(sessionId), (old: ChatSessionDetail | undefined) =>
+        appendMessageToSession(old, message)
+      )
+      toast.success("Đã gửi báo giá cho khách.")
+    },
+    onError: (error) => {
+      toast.error(getApiErrorMessage(error, "Không thể gửi báo giá."))
     },
   })
 }

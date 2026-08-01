@@ -17,6 +17,8 @@ interface MessageListProps {
   /** Customer FE: ẩn tin nội bộ AI/thợ. */
   customerVisibleOnly?: boolean
   onUseAsDraft?: (content: string) => void
+  onAcceptQuote?: (messageId: string) => void
+  isAcceptingQuote?: boolean
   emptyText?: string
 }
 
@@ -27,6 +29,8 @@ export function MessageList({
   saleLane,
   customerVisibleOnly,
   onUseAsDraft,
+  onAcceptQuote,
+  isAcceptingQuote,
   emptyText = "Chưa có tin nhắn.",
 }: MessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -57,6 +61,8 @@ export function MessageList({
           message={message}
           viewerRole={viewerRole}
           onUseAsDraft={onUseAsDraft}
+          onAcceptQuote={onAcceptQuote}
+          isAcceptingQuote={isAcceptingQuote}
         />
       ))}
       <div ref={bottomRef} />

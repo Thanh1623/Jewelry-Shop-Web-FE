@@ -22,7 +22,14 @@ export interface Cart {
   itemCount: number
 }
 
-export type OrderStatus = "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "FAILED"
+export type OrderStatus =
+  | "PENDING_PAYMENT"
+  | "PAID"
+  | "PROCESSING"
+  | "READY"
+  | "DELIVERED"
+  | "CANCELLED"
+  | "FAILED"
 
 export interface OrderItem {
   id: string
@@ -30,6 +37,13 @@ export interface OrderItem {
   productName: string
   unitPrice: number
   quantity: number
+}
+
+export interface OrderUserSummary {
+  id: string
+  fullName: string
+  email: string
+  phone: string | null
 }
 
 export interface Order {
@@ -40,6 +54,11 @@ export interface Order {
   paymentProvider: string
   paymentRef: string | null
   paidAt: string | null
+  quoteMessageId: string | null
+  shippingName: string | null
+  shippingPhone: string | null
+  shippingAddress: string | null
+  user?: OrderUserSummary
   createdAt: string
   updatedAt: string
   items: OrderItem[]

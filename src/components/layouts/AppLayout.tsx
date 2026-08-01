@@ -31,6 +31,9 @@ export function AppLayout() {
             <Link to={urlPaths.saleDashboard} className="rounded-full px-2 py-1 hover:bg-slate-100 hover:text-slate-800">
               Hàng đợi
             </Link>
+            <Link to={urlPaths.adminOrders} className="rounded-full px-2 py-1 hover:bg-slate-100 hover:text-slate-800">
+              Đơn hàng
+            </Link>
             <Link to={urlPaths.home} className="rounded-full px-2 py-1 hover:bg-slate-100 hover:text-slate-800">
               Cửa hàng
             </Link>

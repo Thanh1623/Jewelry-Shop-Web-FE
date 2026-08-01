@@ -2,11 +2,13 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 
 import { LoginPage } from "@/app/auth/components/LoginPage"
 import { RegisterPage } from "@/app/auth/components/RegisterPage"
+import { AdminOrdersPage } from "@/app/cart/components/AdminOrdersPage"
 import { CartPage } from "@/app/cart/components/CartPage"
 import { OrderDetailPage } from "@/app/cart/components/OrderDetailPage"
 import { OrdersPage } from "@/app/cart/components/OrdersPage"
 import { ChatSessionPage } from "@/app/chat/components/ChatSessionPage"
 import { AdminProductsPage } from "@/app/product/components/AdminProductsPage"
+import { ProductDetailPage } from "@/app/product/components/ProductDetailPage"
 import { ShopHomePage } from "@/app/product/components/ShopHomePage"
 import { SaleDashboardPage } from "@/app/sale/components/SaleDashboardPage"
 import { SaleSessionDetailPage } from "@/app/sale/components/SaleSessionDetailPage"
@@ -22,6 +24,7 @@ export const router = createBrowserRouter([
     element: <ShopLayout />,
     children: [
       { path: urlPaths.home, element: <ShopHomePage /> },
+      { path: "/products/:productId", element: <ProductDetailPage /> },
       { path: "/chat/:sessionId", element: <ChatSessionPage /> },
       {
         element: <ProtectedRoute allowedRoles={["CUSTOMER", "ADMIN"]} />,
@@ -34,6 +37,10 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
         children: [{ path: urlPaths.adminProducts, element: <AdminProductsPage /> }],
+      },
+      {
+        element: <ProtectedRoute allowedRoles={["ADMIN", "SALE"]} />,
+        children: [{ path: urlPaths.adminOrders, element: <AdminOrdersPage /> }],
       },
     ],
   },

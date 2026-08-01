@@ -6,13 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { urlPaths } from "@/constants/urlPaths"
 
 import { ordersQueryOptions } from "../queries/cart.queries"
-
-const statusLabel: Record<string, string> = {
-  PENDING_PAYMENT: "Chờ thanh toán",
-  PAID: "Đã thanh toán",
-  CANCELLED: "Đã hủy",
-  FAILED: "Thất bại",
-}
+import { ORDER_STATUS_LABEL } from "../utils/order-status"
 
 export function OrdersPage() {
   const ordersQuery = useQuery(ordersQueryOptions())
@@ -40,7 +34,7 @@ export function OrdersPage() {
               className="flex items-center justify-between gap-3 p-4 text-sm transition hover:bg-muted/40"
             >
               <div>
-                <p className="tracking-wide">{statusLabel[order.status] ?? order.status}</p>
+                <p className="tracking-wide">{ORDER_STATUS_LABEL[order.status] ?? order.status}</p>
                 <p className="text-xs text-muted-foreground">
                   {new Date(order.createdAt).toLocaleString("vi-VN")} · {order.items.length} mục
                 </p>

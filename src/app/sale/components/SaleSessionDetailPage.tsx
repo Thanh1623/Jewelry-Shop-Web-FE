@@ -13,7 +13,7 @@ import { toast } from "sonner"
 
 import { MessageComposer } from "@/app/chat/components/MessageComposer"
 import { MessageList } from "@/app/chat/components/MessageList"
-import { useSendMessageMutation } from "@/app/chat/hooks/use-chat-mutations"
+import { useCreateQuoteMutation, useSendMessageMutation } from "@/app/chat/hooks/use-chat-mutations"
 import { useChatSocket } from "@/app/chat/hooks/use-chat-socket"
 import { chatSessionQueryOptions } from "@/app/chat/queries/chat.queries"
 import { formatVnd } from "@/app/product/utils/format-price"
@@ -24,8 +24,13 @@ import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
 
 import { useAskAdvisorMutation, useAskCraftsmanMutation } from "../hooks/use-sale-actions-mutations"
+import {
+  useClaimSessionMutation,
+  useReleaseSessionMutation,
+} from "../hooks/use-claim-session-mutation"
 import type { CraftsmanRequestStatus } from "../types/sale.types"
 import { AskCraftsmanDialog } from "./AskCraftsmanDialog"
+import { QuoteForm } from "./QuoteForm"
 import { SaleChatLane } from "./SaleChatLane"
 
 const CRAFTSMAN_STATUS_LABEL: Record<CraftsmanRequestStatus, string> = {
@@ -76,8 +81,12 @@ export function SaleSessionDetailPage() {
 
   const sessionQuery = useQuery(chatSessionQueryOptions(sessionId ?? ""))
   const sendMessageMutation = useSendMessageMutation(sessionId ?? "", "SALE")
+  const createQuoteMutation = useCreateQuoteMutation(sessionId ?? "")
   const askAdvisorMutation = useAskAdvisorMutation(sessionId ?? "")
   const askCraftsmanMutation = useAskCraftsmanMutation(sessionId)
+  const claimMutation = useClaimSessionMutation()
+  const releaseMutation = useReleaseSessionMutation()
+  const userId = useAuthStore((state) => state.user?.id)
 
   useChatSocket({
     sessionId,
@@ -151,6 +160,9 @@ export function SaleSessionDetailPage() {
     .filter(Boolean)
     .join(" · ")
   const product = session.product
+  const isMine = session.saleId === userId
+  const isUnclaimed = !session.saleId
+  const claimedByOther = Boolean(session.saleId && !isMine)
 
   const customerLane = (
     <SaleChatLane
@@ -160,21 +172,31 @@ export function SaleSessionDetailPage() {
       accent="customer"
       onHide={() => toggleLane("customer")}
       footer={
-        <MessageComposer
-          key={draftNonce}
-          allowImage
-          draftContent={draftContent}
-          placeholder="Soạn trả lời gửi khách..."
-          translatePreviewSessionId={sessionId}
-          customerLocaleHint={session.customerLocale}
-          onSend={(payload) =>
-            sendMessageMutation.mutate({
-              content: payload.content,
-              imageUrl: payload.imageUrl,
-            })
-          }
-          isSending={sendMessageMutation.isPending}
-        />
+        <div className="flex flex-col gap-2">
+          {product && (
+            <QuoteForm
+              isSubmitting={createQuoteMutation.isPending}
+              onSubmit={(values) =>
+                createQuoteMutation.mutate({ productId: product.id, ...values })
+              }
+            />
+          )}
+          <MessageComposer
+            key={draftNonce}
+            allowImage
+            draftContent={draftContent}
+            placeholder="Soạn trả lời gửi khách..."
+            translatePreviewSessionId={sessionId}
+            customerLocaleHint={session.customerLocale}
+            onSend={(payload) =>
+              sendMessageMutation.mutate({
+                content: payload.content,
+                imageUrl: payload.imageUrl,
+              })
+            }
+            isSending={sendMessageMutation.isPending}
+          />
+        </div>
       }
     >
       <MessageList
@@ -314,6 +336,35 @@ export function SaleSessionDetailPage() {
                 : ""}
             </p>
           </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2">
+          {isUnclaimed && sessionId && (
+            <Button
+              size="sm"
+              className="h-8 rounded-full"
+              disabled={claimMutation.isPending}
+              onClick={() => claimMutation.mutate(sessionId)}
+            >
+              Nhận phiên
+            </Button>
+          )}
+          {isMine && sessionId && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 rounded-full"
+              disabled={releaseMutation.isPending}
+              onClick={() => releaseMutation.mutate(sessionId)}
+            >
+              Trả lại
+            </Button>
+          )}
+          {claimedByOther && (
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] text-slate-600">
+              Sale khác đang phụ trách
+            </span>
+          )}
         </div>
 
         <div className="hidden items-center gap-1.5 lg:flex">

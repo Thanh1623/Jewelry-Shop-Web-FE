@@ -1,15 +1,19 @@
+import { formatVnd } from "@/app/product/utils/format-price"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 import type { ChatMessage, ChatViewerRole } from "../types/chat.types"
 import { getMessageI18n } from "../utils/message-i18n"
 import { getInternalLane, getMessageImageUrl } from "../utils/message-lanes"
+import { getQuoteMeta } from "../utils/message-quote"
 import { SenderBadge } from "./SenderBadge"
 
 interface MessageBubbleProps {
   message: ChatMessage
   viewerRole: ChatViewerRole
   onUseAsDraft?: (content: string) => void
+  onAcceptQuote?: (messageId: string) => void
+  isAcceptingQuote?: boolean
 }
 
 const DRAFTABLE_SENDERS = new Set(["AI", "CRAFTSMAN"])
@@ -18,6 +22,8 @@ export function MessageBubble({
   message,
   viewerRole,
   onUseAsDraft,
+  onAcceptQuote,
+  isAcceptingQuote,
 }: MessageBubbleProps) {
   const isCustomer = message.sender === "CUSTOMER"
   const isInternalReply = message.sender === "AI" || message.sender === "CRAFTSMAN"
@@ -27,6 +33,7 @@ export function MessageBubble({
   const canDraft = Boolean(onUseAsDraft) && DRAFTABLE_SENDERS.has(message.sender)
   const imageUrl = getMessageImageUrl(message)
   const i18n = getMessageI18n(message)
+  const quote = getQuoteMeta(message)
   const time = new Date(message.createdAt).toLocaleTimeString("vi-VN", {
     hour: "2-digit",
     minute: "2-digit",
@@ -84,6 +91,24 @@ export function MessageBubble({
           </a>
         )}
         {showContent && <p className="whitespace-pre-wrap">{message.content}</p>}
+        {quote && (
+          <div
+            className={cn(
+              "mt-2 space-y-1 rounded-xl border px-3 py-2 text-xs",
+              isCustomer || message.sender === "SALE"
+                ? "border-white/20 bg-black/10"
+                : "border-teal-100 bg-teal-50/60 text-slate-700"
+            )}
+          >
+            <p className="font-medium">Báo giá{quote.productName ? ` · ${quote.productName}` : ""}</p>
+            <p>
+              {formatVnd(quote.unitPrice)} × {quote.quantity}
+              {quote.size ? ` · Size ${quote.size}` : ""}
+            </p>
+            <p className="font-semibold">Tổng {formatVnd(quote.unitPrice * quote.quantity)}</p>
+            {quote.note && <p className="opacity-80">{quote.note}</p>}
+          </div>
+        )}
         {saleViewOfCustomer && (
           <p className="mt-2 border-t border-teal-100 pt-2 text-[11px] text-slate-500">
             <span className="font-medium text-slate-700">Dịch ({i18n.targetLocale}): </span>
@@ -111,6 +136,17 @@ export function MessageBubble({
           onClick={() => onUseAsDraft?.(message.content)}
         >
           Chuyển sang kênh Khách
+        </Button>
+      )}
+      {quote && viewerRole === "customer" && onAcceptQuote && (
+        <Button
+          type="button"
+          size="sm"
+          className="h-7 rounded-full bg-teal-600 px-3 text-[11px] hover:bg-teal-700"
+          disabled={isAcceptingQuote}
+          onClick={() => onAcceptQuote(message.id)}
+        >
+          {isAcceptingQuote ? "Đang xử lý..." : "Đồng ý & thanh toán"}
         </Button>
       )}
     </div>

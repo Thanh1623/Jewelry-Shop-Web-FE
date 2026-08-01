@@ -71,15 +71,26 @@ export function ShopLayout() {
               </>
             )}
             {user?.role === "ADMIN" && (
-              <Link
-                to={urlPaths.adminProducts}
-                className={cn(
-                  "transition hover:opacity-80",
-                  isHome ? "text-white/80" : "text-muted-foreground"
-                )}
-              >
-                Admin
-              </Link>
+              <>
+                <Link
+                  to={urlPaths.adminProducts}
+                  className={cn(
+                    "transition hover:opacity-80",
+                    isHome ? "text-white/80" : "text-muted-foreground"
+                  )}
+                >
+                  Admin
+                </Link>
+                <Link
+                  to={urlPaths.adminOrders}
+                  className={cn(
+                    "hidden transition hover:opacity-80 sm:inline",
+                    isHome ? "text-white/80" : "text-muted-foreground"
+                  )}
+                >
+                  Quản lý đơn
+                </Link>
+              </>
             )}
             {user?.role === "SALE" && (
               <Link

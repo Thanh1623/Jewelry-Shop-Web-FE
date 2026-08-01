@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
+import { useState } from "react"
 import { Link } from "react-router-dom"
 
 import { formatVnd } from "@/app/product/utils/format-price"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { urlPaths } from "@/constants/urlPaths"
 import { useAuthStore } from "@/stores/auth-store"
@@ -21,6 +24,9 @@ export function CartPage() {
   const updateQty = useUpdateCartQuantityMutation()
   const removeItem = useRemoveCartItemMutation()
   const checkout = useCheckoutMutation()
+  const [shippingName, setShippingName] = useState("")
+  const [shippingPhone, setShippingPhone] = useState("")
+  const [shippingAddress, setShippingAddress] = useState("")
 
   if (!enabled) {
     return (
@@ -125,6 +131,47 @@ export function CartPage() {
             ))}
           </ul>
 
+          <div className="space-y-3 border border-border p-4">
+            <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
+              Giao hàng (tùy chọn)
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="shippingName" className="text-xs">
+                  Người nhận
+                </Label>
+                <Input
+                  id="shippingName"
+                  value={shippingName}
+                  onChange={(e) => setShippingName(e.target.value)}
+                  className="rounded-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="shippingPhone" className="text-xs">
+                  SĐT
+                </Label>
+                <Input
+                  id="shippingPhone"
+                  value={shippingPhone}
+                  onChange={(e) => setShippingPhone(e.target.value)}
+                  className="rounded-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="shippingAddress" className="text-xs">
+                  Địa chỉ
+                </Label>
+                <Input
+                  id="shippingAddress"
+                  value={shippingAddress}
+                  onChange={(e) => setShippingAddress(e.target.value)}
+                  className="rounded-none"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-4 border border-border p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-xs text-muted-foreground">{cart.itemCount} sản phẩm</p>
@@ -133,7 +180,13 @@ export function CartPage() {
             <Button
               className="rounded-none"
               disabled={checkout.isPending}
-              onClick={() => checkout.mutate()}
+              onClick={() =>
+                checkout.mutate({
+                  shippingName: shippingName.trim() || undefined,
+                  shippingPhone: shippingPhone.trim() || undefined,
+                  shippingAddress: shippingAddress.trim() || undefined,
+                })
+              }
             >
               {checkout.isPending ? "Đang tạo đơn..." : "Thanh toán demo"}
             </Button>

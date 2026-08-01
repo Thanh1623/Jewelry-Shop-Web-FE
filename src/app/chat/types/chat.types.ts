@@ -15,6 +15,13 @@ export interface ChatMessageMeta {
   i18n?: MessageI18nMeta
   internalLane?: "AI" | "CRAFTSMAN"
   imageUrl?: string
+  type?: "quote"
+  productId?: string
+  productName?: string
+  unitPrice?: number
+  quantity?: number
+  size?: number
+  note?: string
   [key: string]: unknown
 }
 
@@ -42,6 +49,12 @@ export interface ChatSessionCustomerSummary {
   phone: string | null
 }
 
+export interface ChatSessionSaleSummary {
+  id: string
+  fullName: string
+  email: string
+}
+
 export interface ChatSessionDetail {
   id: string
   productId: string | null
@@ -67,6 +80,7 @@ export interface ChatSessionSummary {
   isOpen: boolean
   product: ChatSessionProductSummary | null
   customer: ChatSessionCustomerSummary | null
+  sale: ChatSessionSaleSummary | null
   lastMessage: Pick<ChatMessage, "id" | "sender" | "content" | "createdAt"> | null
   createdAt: string
   updatedAt: string
@@ -90,4 +104,12 @@ export interface TranslatePreviewResponse {
   targetLocale: string
   translatedText: string
   customerLocale: string | null
+}
+
+export interface CreateQuotePayload {
+  productId: string
+  unitPrice: number
+  quantity: number
+  size?: number
+  note?: string
 }

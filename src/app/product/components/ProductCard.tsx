@@ -1,4 +1,7 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
+
+import { urlPaths } from "@/constants/urlPaths"
 
 import { formatVnd } from "../utils/format-price"
 import type { Product } from "../types/product.types"
@@ -53,20 +56,33 @@ export function ProductCard({
         </span>
       </button>
       <div className="mt-3 space-y-1">
-        <h3 className="line-clamp-1 text-sm tracking-wide">{product.name}</h3>
+        <Link
+          to={urlPaths.productDetail(product.id)}
+          className="line-clamp-1 block text-sm tracking-wide hover:underline"
+        >
+          {product.name}
+        </Link>
         <p className="text-xs text-muted-foreground">
           {product.weightGrams}g · Công {formatVnd(product.laborCost)}
         </p>
-        {onAddToCart && (
-          <button
-            type="button"
-            disabled={isAddingToCart}
-            onClick={() => onAddToCart(product)}
-            className="text-[11px] tracking-[0.16em] text-foreground/80 uppercase underline-offset-4 hover:underline disabled:opacity-50"
+        <div className="flex items-center gap-3">
+          <Link
+            to={urlPaths.productDetail(product.id)}
+            className="text-[11px] tracking-[0.16em] text-foreground/80 uppercase underline-offset-4 hover:underline"
           >
-            {isAddingToCart ? "Đang thêm..." : "Thêm giỏ"}
-          </button>
-        )}
+            Chi tiết
+          </Link>
+          {onAddToCart && (
+            <button
+              type="button"
+              disabled={isAddingToCart}
+              onClick={() => onAddToCart(product)}
+              className="text-[11px] tracking-[0.16em] text-foreground/80 uppercase underline-offset-4 hover:underline disabled:opacity-50"
+            >
+              {isAddingToCart ? "Đang thêm..." : "Thêm giỏ"}
+            </button>
+          )}
+        </div>
       </div>
     </article>
   )

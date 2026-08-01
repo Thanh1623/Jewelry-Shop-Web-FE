@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
+import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import { useUpsertCartItemMutation } from "@/app/cart/hooks/use-cart-mutations"
 import { useCreateSessionMutation } from "@/app/chat/hooks/use-chat-mutations"
+import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { urlPaths } from "@/constants/urlPaths"
+import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth-store"
 
 import { productsQueryOptions } from "../queries/product.queries"
@@ -14,12 +17,34 @@ import { ProductCard } from "./ProductCard"
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=2000&q=85"
 
+const CATEGORIES = [
+  { key: "ALL", label: "Tất cả" },
+  { key: "RING", label: "Nhẫn" },
+  { key: "NECK", label: "Dây chuyền" },
+  { key: "BRAC", label: "Lắc tay" },
+  { key: "EAR", label: "Bông tai" },
+] as const
+
+type CategoryKey = (typeof CATEGORIES)[number]["key"]
+
 export function ShopHomePage() {
   const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
+  const [search, setSearch] = useState("")
+  const [category, setCategory] = useState<CategoryKey>("ALL")
   const productsQuery = useQuery(productsQueryOptions())
   const createSessionMutation = useCreateSessionMutation()
   const addToCartMutation = useUpsertCartItemMutation()
+
+  const filteredProducts = useMemo(() => {
+    const list = productsQuery.data ?? []
+    const term = search.trim().toLowerCase()
+    return list.filter((product) => {
+      const matchesCategory = category === "ALL" || product.sku.startsWith(category)
+      const matchesSearch = !term || product.name.toLowerCase().includes(term)
+      return matchesCategory && matchesSearch
+    })
+  }, [productsQuery.data, search, category])
 
   function handleChatClick(product: Product) {
     if (!user || user.role !== "CUSTOMER") {
@@ -82,6 +107,32 @@ export function ShopHomePage() {
             </p>
           </div>
 
+          <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setCategory(item.key)}
+                  className={cn(
+                    "rounded-full border px-3.5 py-1.5 text-xs tracking-wide uppercase transition",
+                    category === item.key
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-border text-muted-foreground hover:border-foreground/50 hover:text-foreground"
+                  )}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Tìm sản phẩm..."
+              className="h-9 max-w-xs rounded-full"
+            />
+          </div>
+
           {productsQuery.isPending && (
             <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
@@ -97,13 +148,13 @@ export function ShopHomePage() {
             <p className="text-sm text-destructive">Không tải được sản phẩm.</p>
           )}
 
-          {productsQuery.data && productsQuery.data.length === 0 && (
-            <p className="text-sm text-muted-foreground">Chưa có sản phẩm.</p>
+          {productsQuery.data && filteredProducts.length === 0 && (
+            <p className="text-sm text-muted-foreground">Không tìm thấy sản phẩm phù hợp.</p>
           )}
 
-          {productsQuery.data && productsQuery.data.length > 0 && (
+          {productsQuery.data && filteredProducts.length > 0 && (
             <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
-              {productsQuery.data.map((product, index) => (
+              {filteredProducts.map((product, index) => (
                 <ProductCard
                   key={product.id}
                   product={product}

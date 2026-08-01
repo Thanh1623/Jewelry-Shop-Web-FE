@@ -11,13 +11,7 @@ import {
   usePayDemoMutation,
 } from "../hooks/use-cart-mutations"
 import { orderDetailQueryOptions } from "../queries/cart.queries"
-
-const statusLabel: Record<string, string> = {
-  PENDING_PAYMENT: "Chờ thanh toán",
-  PAID: "Đã thanh toán",
-  CANCELLED: "Đã hủy",
-  FAILED: "Thất bại",
-}
+import { ORDER_STATUS_LABEL } from "../utils/order-status"
 
 export function OrderDetailPage() {
   const { orderId = "" } = useParams()
@@ -44,9 +38,15 @@ export function OrderDetailPage() {
         </Link>
         <h1 className="mt-2 text-2xl font-light tracking-wide">Đơn hàng</h1>
         <p className="mt-1 text-xs text-muted-foreground">
-          {statusLabel[order.status] ?? order.status}
+          {ORDER_STATUS_LABEL[order.status] ?? order.status}
           {order.paymentRef ? ` · Ref ${order.paymentRef}` : ""}
         </p>
+        {order.shippingAddress && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            Giao đến: {order.shippingName ?? "—"}
+            {order.shippingPhone ? ` · ${order.shippingPhone}` : ""} · {order.shippingAddress}
+          </p>
+        )}
       </div>
 
       <ul className="divide-y divide-border border border-border">

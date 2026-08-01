@@ -5,6 +5,7 @@ import type {
   ChatMessage,
   ChatSessionDetail,
   ChatSessionSummary,
+  CreateQuotePayload,
   CreateSessionPayload,
   SendMessagePayload,
   TranslatePreviewResponse,
@@ -38,12 +39,41 @@ export async function fetchOpenSessionsRequest(): Promise<
   return data
 }
 
+export async function claimSessionRequest(
+  sessionId: string
+): Promise<ChatSessionSummary> {
+  const { data } = await httpService.post<ChatSessionSummary>(
+    apiPaths.chatSessionClaim(sessionId)
+  )
+  return data
+}
+
+export async function releaseSessionRequest(
+  sessionId: string
+): Promise<ChatSessionSummary> {
+  const { data } = await httpService.post<ChatSessionSummary>(
+    apiPaths.chatSessionRelease(sessionId)
+  )
+  return data
+}
+
 export async function postMessageRequest(
   sessionId: string,
   payload: SendMessagePayload
 ): Promise<ChatMessage> {
   const { data } = await httpService.post<ChatMessage>(
     `${apiPaths.chatSessions}/${sessionId}/messages`,
+    payload
+  )
+  return data
+}
+
+export async function createQuoteRequest(
+  sessionId: string,
+  payload: CreateQuotePayload
+): Promise<ChatMessage> {
+  const { data } = await httpService.post<ChatMessage>(
+    apiPaths.chatSessionQuote(sessionId),
     payload
   )
   return data
