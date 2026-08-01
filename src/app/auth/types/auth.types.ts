@@ -4,6 +4,7 @@ export interface AuthUser {
   id: string
   email: string
   fullName: string
+  phone: string | null
   role: UserRole
 }
 
@@ -21,4 +22,5 @@ export interface RegisterPayload {
   email: string
   password: string
   fullName: string
+  phone?: string
 }

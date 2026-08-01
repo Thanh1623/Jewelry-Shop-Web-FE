@@ -15,20 +15,20 @@ export function AppLayout() {
 
   return (
     <div className="min-h-svh bg-background">
-      <header className="border-b border-border/60 bg-card/60 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <Link to={urlPaths.saleDashboard} className="font-heading text-lg font-semibold tracking-tight">
-            Bạc Ý Jewelry <span className="text-muted-foreground">— Kênh Sale</span>
+      <header className="border-b border-border bg-card">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2.5">
+          <Link to={urlPaths.saleDashboard} className="text-sm font-semibold">
+            BẠC Ý · Sale
           </Link>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">{user?.fullName}</span>
-            <Button variant="outline" size="sm" onClick={logout}>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">{user?.fullName}</span>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={logout}>
               Đăng xuất
             </Button>
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl p-6">
+      <main className="mx-auto w-full max-w-6xl px-4 py-3">
         <Outlet />
       </main>
     </div>

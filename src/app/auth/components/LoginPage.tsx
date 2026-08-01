@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { useForm } from "react-hook-form"
 
 import { useLoginMutation } from "@/app/auth/hooks/use-auth-mutations"
@@ -9,13 +9,7 @@ import {
   type LoginFormInput,
 } from "@/app/auth/schemas/login.schema"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -27,8 +21,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { urlPaths } from "@/constants/urlPaths"
 
+const showDemoHints = import.meta.env.DEV
+
 export function LoginPage() {
+  const [searchParams] = useSearchParams()
+  const productId = searchParams.get("productId")
   const loginMutation = useLoginMutation()
+  const registerHref = productId
+    ? `${urlPaths.register}?productId=${productId}`
+    : urlPaths.register
 
   const form = useForm<LoginFormInput>({
     resolver: zodResolver(loginSchema),
@@ -40,17 +41,18 @@ export function LoginPage() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Đăng nhập nhân viên</CardTitle>
-        <CardDescription>Nhập email và mật khẩu để vào kênh tư vấn bán hàng.</CardDescription>
+    <Card className="border-border shadow-none">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">Đăng nhập</CardTitle>
+        {productId && (
+          <p className="text-xs text-muted-foreground">
+            Đăng nhập để hỏi giá sản phẩm.
+          </p>
+        )}
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
             <FormField
               control={form.control}
               name="email"
@@ -58,18 +60,12 @@ export function LoginPage() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      autoComplete="email"
-                      {...field}
-                    />
+                    <Input type="email" autoComplete="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="password"
@@ -77,33 +73,31 @@ export function LoginPage() {
                 <FormItem>
                   <FormLabel>Mật khẩu</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••"
-                      autoComplete="current-password"
-                      {...field}
-                    />
+                    <Input type="password" autoComplete="current-password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <Button type="submit" disabled={loginMutation.isPending}>
               {loginMutation.isPending ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </form>
         </Form>
 
-        <Button asChild variant="link" className="mt-4 px-0">
-          <Link to={urlPaths.register}>Chưa có tài khoản? Đăng ký</Link>
-        </Button>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Chưa có tài khoản?{" "}
+          <Link to={registerHref} className="text-foreground underline">
+            Đăng ký
+          </Link>
+        </p>
 
-        <div className="mt-4 rounded-2xl bg-muted/60 p-3 text-xs text-muted-foreground">
-          <p className="font-medium text-foreground">Tài khoản demo</p>
-          <p>Sale: sale@jewelry.local / Sale123456!</p>
-          <p>Khách hàng không cần đăng nhập để trò chuyện.</p>
-        </div>
+        {showDemoHints && (
+          <div className="mt-2 space-y-0.5 text-xs text-muted-foreground">
+            <p>Demo khách: customer@jewelry.local / Customer123456!</p>
+            <p>Demo sale: sale@jewelry.local / Sale123456!</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

@@ -7,6 +7,7 @@ export interface AuthUser {
   id: string
   email: string
   fullName: string
+  phone: string | null
   role: UserRole
 }
 
@@ -18,13 +19,6 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  /**
-   * persist là middleware để lưu trữ state vào localStorage
-   * @param name là tên của store
-   * @param partialize là hàm để lọc các field cần lưu trữ
-   * @returns AuthState
-   */
-
   persist(
     (set) => ({
       accessToken: null,

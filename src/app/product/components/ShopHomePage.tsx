@@ -1,75 +1,126 @@
 import { useQuery } from "@tanstack/react-query"
-import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { useCreateSessionMutation } from "@/app/chat/hooks/use-chat-mutations"
 import { Skeleton } from "@/components/ui/skeleton"
+import { urlPaths } from "@/constants/urlPaths"
+import { useAuthStore } from "@/stores/auth-store"
 
 import { productsQueryOptions } from "../queries/product.queries"
 import type { Product } from "../types/product.types"
-import { GuestNameDialog } from "./GuestNameDialog"
 import { ProductCard } from "./ProductCard"
 
+const HERO_IMAGE =
+  "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=2000&q=85"
+
 export function ShopHomePage() {
+  const navigate = useNavigate()
+  const user = useAuthStore((state) => state.user)
   const productsQuery = useQuery(productsQueryOptions())
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const createSessionMutation = useCreateSessionMutation()
 
-  function handleConfirm(guestName: string) {
-    if (!selectedProduct) {
+  function handleChatClick(product: Product) {
+    if (!user || user.role !== "CUSTOMER") {
+      navigate(`${urlPaths.login}?productId=${product.id}`)
       return
     }
-
-    createSessionMutation.mutate(
-      { productId: selectedProduct.id, guestName },
-      { onSuccess: () => setSelectedProduct(null) }
-    )
+    createSessionMutation.mutate({ productId: product.id })
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold">Bộ sưu tập trang sức bạc</h1>
-        <p className="text-muted-foreground">
-          Chọn một sản phẩm và trò chuyện với chúng tôi để nhận báo giá.
-        </p>
-      </div>
+    <div>
+      {/* Inspired by Tiffany / Cartier editorial heroes: brand first, full-bleed, one CTA */}
+      <section className="relative flex min-h-[100svh] items-end overflow-hidden">
+        <img
+          src={HERO_IMAGE}
+          alt="Trang sức bạc Bạc Ý"
+          className="absolute inset-0 size-full object-cover animate-hero-kenburns"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/25" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.35)_100%)]" />
 
-      {productsQuery.isPending && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <Skeleton key={index} className="aspect-[3/4] rounded-3xl" />
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-28 text-white sm:px-6 sm:pb-20">
+          <p className="animate-fade-up text-[11px] tracking-[0.4em] text-white/70 uppercase">
+            Silver atelier
+          </p>
+          <h1 className="animate-fade-up-delay-1 mt-3 max-w-3xl text-5xl leading-[0.95] font-light tracking-[0.12em] sm:text-7xl md:text-8xl">
+            BẠC Ý
+          </h1>
+          <p className="animate-fade-up-delay-2 mt-5 max-w-md text-sm leading-relaxed text-white/85 sm:text-base">
+            Trang sức bạc 925 chế tác tinh xảo — hỏi giá realtime với chuyên viên và thợ kim hoàn.
+          </p>
+          <a
+            href="#bo-suu-tap"
+            className="animate-fade-up-delay-3 mt-8 inline-flex border border-white/70 px-7 py-3 text-xs tracking-[0.22em] uppercase transition hover:bg-white hover:text-slate-900"
+          >
+            Khám phá
+          </a>
+        </div>
+      </section>
+
+      <section id="bo-suu-tap" className="scroll-mt-20 bg-background">
+        <div className="mx-auto w-full max-w-6xl px-5 py-14 sm:px-6 sm:py-16">
+          <div className="mb-8 flex items-end justify-between gap-4 border-b border-border pb-4">
+            <div>
+              <p className="text-[11px] tracking-[0.3em] text-muted-foreground uppercase">
+                Collection
+              </p>
+              <h2 className="mt-1 text-2xl font-light tracking-wide sm:text-3xl">Bộ sưu tập</h2>
+            </div>
+            <p className="hidden max-w-xs text-right text-xs leading-relaxed text-muted-foreground sm:block">
+              Chọn mẫu · Đăng nhập · Nhận báo giá realtime
+            </p>
+          </div>
+
+          {productsQuery.isPending && (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="space-y-3">
+                  <Skeleton className="aspect-[3/4] w-full rounded-none" />
+                  <Skeleton className="h-3 w-2/3 rounded-none" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {productsQuery.isError && (
+            <p className="text-sm text-destructive">Không tải được sản phẩm.</p>
+          )}
+
+          {productsQuery.data && productsQuery.data.length === 0 && (
+            <p className="text-sm text-muted-foreground">Chưa có sản phẩm.</p>
+          )}
+
+          {productsQuery.data && productsQuery.data.length > 0 && (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+              {productsQuery.data.map((product, index) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onChatClick={handleChatClick}
+                  isStarting={createSessionMutation.isPending}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="border-t border-border bg-muted/40">
+        <div className="mx-auto grid w-full max-w-6xl gap-8 px-5 py-12 sm:grid-cols-3 sm:px-6 sm:py-14">
+          {[
+            { title: "Bạc 925", desc: "Chất liệu chuẩn, hoàn thiện bóng gương hoặc mờ." },
+            { title: "Tư vấn realtime", desc: "Chat trực tiếp với sale, hỗ trợ AI và thợ chế tác." },
+            { title: "Báo giá minh bạch", desc: "Theo trọng lượng, size và công thợ — chỉnh trước khi gửi." },
+          ].map((item) => (
+            <div key={item.title}>
+              <h3 className="text-sm tracking-[0.18em] uppercase">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
+            </div>
           ))}
         </div>
-      )}
-
-      {productsQuery.isError && (
-        <p className="text-sm text-destructive">Không thể tải danh sách sản phẩm.</p>
-      )}
-
-      {productsQuery.data && productsQuery.data.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          Chưa có sản phẩm nào. Hãy khởi động lại Shop API để seed dữ liệu demo.
-        </p>
-      )}
-
-      {productsQuery.data && productsQuery.data.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {productsQuery.data.map((product) => (
-            <ProductCard key={product.id} product={product} onChatClick={setSelectedProduct} />
-          ))}
-        </div>
-      )}
-
-      <GuestNameDialog
-        product={selectedProduct}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedProduct(null)
-          }
-        }}
-        onConfirm={handleConfirm}
-        isSubmitting={createSessionMutation.isPending}
-      />
+      </section>
     </div>
   )
 }

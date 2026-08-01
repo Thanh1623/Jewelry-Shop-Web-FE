@@ -1,8 +1,4 @@
-import { MessageCircleQuestionIcon } from "lucide-react"
 import { useState } from "react"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
 import { formatVnd } from "../utils/format-price"
 import type { Product } from "../types/product.types"
@@ -10,45 +6,54 @@ import type { Product } from "../types/product.types"
 interface ProductCardProps {
   product: Product
   onChatClick: (product: Product) => void
+  isStarting?: boolean
+  index?: number
 }
 
-export function ProductCard({ product, onChatClick }: ProductCardProps) {
+export function ProductCard({
+  product,
+  onChatClick,
+  isStarting,
+  index = 0,
+}: ProductCardProps) {
   const [imageFailed, setImageFailed] = useState(false)
   const showImage = Boolean(product.imageUrl) && !imageFailed
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden">
-      <div className="aspect-square w-full overflow-hidden bg-muted">
+    <article
+      className="group flex flex-col"
+      style={{ animationDelay: `${Math.min(index, 8) * 0.06}s` }}
+    >
+      <button
+        type="button"
+        disabled={isStarting}
+        onClick={() => onChatClick(product)}
+        className="relative aspect-[3/4] w-full overflow-hidden bg-muted text-left disabled:opacity-60"
+      >
         {showImage ? (
           <img
             src={product.imageUrl!}
             alt={product.name}
-            className="size-full object-cover"
+            className="size-full object-cover transition duration-700 ease-out group-hover:scale-[1.05]"
             loading="lazy"
             onError={() => setImageFailed(true)}
           />
         ) : (
-          <div className="flex size-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-400 text-sm font-medium text-slate-700">
+          <div className="metal-sheen flex size-full items-center justify-center px-3 text-center text-sm font-medium text-slate-700">
             {product.name}
           </div>
         )}
+        <div className="absolute inset-0 bg-black/0 transition duration-500 group-hover:bg-black/25" />
+        <span className="absolute inset-x-0 bottom-0 translate-y-full bg-white/95 px-3 py-3 text-center text-[11px] tracking-[0.2em] text-slate-900 uppercase transition duration-500 group-hover:translate-y-0">
+          {isStarting ? "Đang mở..." : "Hỏi giá"}
+        </span>
+      </button>
+      <div className="mt-3 space-y-0.5">
+        <h3 className="line-clamp-1 text-sm tracking-wide">{product.name}</h3>
+        <p className="text-xs text-muted-foreground">
+          {product.weightGrams}g · Công {formatVnd(product.laborCost)}
+        </p>
       </div>
-      <CardContent className="flex flex-1 flex-col gap-1.5 pt-4">
-        <h3 className="font-heading font-medium">{product.name}</h3>
-        <p className="line-clamp-2 text-sm text-muted-foreground">{product.description}</p>
-        <dl className="mt-2 grid grid-cols-2 gap-x-2 text-sm">
-          <dt className="text-muted-foreground">Khối lượng</dt>
-          <dd className="text-right font-medium">{product.weightGrams}g</dd>
-          <dt className="text-muted-foreground">Tiền công</dt>
-          <dd className="text-right font-medium">{formatVnd(product.laborCost)}</dd>
-        </dl>
-      </CardContent>
-      <CardFooter>
-        <Button className="w-full" onClick={() => onChatClick(product)}>
-          <MessageCircleQuestionIcon data-icon="inline-start" />
-          Chat hỏi giá
-        </Button>
-      </CardFooter>
-    </Card>
+    </article>
   )
 }

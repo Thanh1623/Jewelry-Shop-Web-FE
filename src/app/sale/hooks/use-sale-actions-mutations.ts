@@ -4,6 +4,7 @@ import { toast } from "sonner"
 import { getApiErrorMessage } from "@/lib/get-api-error-message"
 
 import { askAdvisorRequest, askCraftsmanRequest } from "../services/sale-actions.service"
+import type { AskCraftsmanPayload } from "../types/sale.types"
 
 export function useAskAdvisorMutation(sessionId: string) {
   return useMutation({
@@ -17,9 +18,9 @@ export function useAskAdvisorMutation(sessionId: string) {
   })
 }
 
-export function useAskCraftsmanMutation(sessionId: string) {
+export function useAskCraftsmanMutation() {
   return useMutation({
-    mutationFn: () => askCraftsmanRequest(sessionId),
+    mutationFn: (payload: AskCraftsmanPayload) => askCraftsmanRequest(payload),
     onSuccess: () => {
       toast.success("Đã gửi câu hỏi cho thợ chế tác.")
     },

@@ -56,8 +56,7 @@ export function GuestNameDialog({
         <DialogHeader>
           <DialogTitle>Chat hỏi giá</DialogTitle>
           <DialogDescription>
-            Cho chúng tôi biết tên của bạn để bắt đầu trò chuyện về{" "}
-            <span className="font-medium text-foreground">{product?.name}</span>.
+            Nhập tên để chat về <span className="font-medium text-foreground">{product?.name}</span>.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

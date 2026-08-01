@@ -33,6 +33,13 @@ export interface ChatSessionProductSummary {
   imageUrl: string | null
 }
 
+export interface ChatSessionCustomerSummary {
+  id: string
+  fullName: string
+  email: string
+  phone: string | null
+}
+
 export interface ChatSessionDetail {
   id: string
   productId: string | null
@@ -43,6 +50,7 @@ export interface ChatSessionDetail {
   customerLocale: string | null
   isOpen: boolean
   product: Product | null
+  customer: ChatSessionCustomerSummary | null
   messages: ChatMessage[]
   createdAt: string
   updatedAt: string
@@ -56,6 +64,7 @@ export interface ChatSessionSummary {
   saleId: string | null
   isOpen: boolean
   product: ChatSessionProductSummary | null
+  customer: ChatSessionCustomerSummary | null
   lastMessage: Pick<ChatMessage, "id" | "sender" | "content" | "createdAt"> | null
   createdAt: string
   updatedAt: string

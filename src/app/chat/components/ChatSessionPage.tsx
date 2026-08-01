@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 import { useChatSocket } from "../hooks/use-chat-socket"
@@ -19,25 +18,21 @@ export function ChatSessionPage() {
   useChatSocket({ sessionId })
 
   if (sessionQuery.isPending) {
-    return <Skeleton className="h-96 w-full rounded-3xl" />
+    return <Skeleton className="h-[70vh] w-full" />
   }
 
   if (sessionQuery.isError || !sessionQuery.data) {
-    return (
-      <p className="text-center text-sm text-muted-foreground">
-        Không tìm thấy phiên trò chuyện này.
-      </p>
-    )
+    return <p className="text-sm text-muted-foreground">Không tìm thấy phiên chat.</p>
   }
 
   const session = sessionQuery.data
 
   return (
-    <Card className="mx-auto flex h-[75vh] max-w-2xl flex-col">
-      <CardHeader className="border-b border-border/60 pb-4">
+    <div className="mx-auto flex h-[70vh] max-w-2xl flex-col overflow-hidden border border-border bg-card">
+      <div className="border-b border-border px-3 py-2">
         <ChatProductSummary session={session} />
-      </CardHeader>
-      <CardContent className="flex flex-1 flex-col overflow-hidden p-0">
+      </div>
+      <div className="flex flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto">
           <MessageList messages={session.messages} viewerRole="customer" />
         </div>
@@ -46,7 +41,7 @@ export function ChatSessionPage() {
           isSending={sendMessageMutation.isPending}
           disabled={!session.isOpen}
         />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

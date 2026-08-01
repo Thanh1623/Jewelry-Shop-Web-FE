@@ -19,6 +19,14 @@ export interface AdvisorAskResponse {
 
 export type CraftsmanRequestStatus = "PENDING" | "SENT" | "ANSWERED" | "FAILED"
 
+export interface AskCraftsmanPayload {
+  sessionId: string
+  question?: string
+  customerNote?: string
+  productImageUrl?: string
+  referenceImageUrl?: string
+}
+
 export interface CraftsmanRequest {
   id: string
   sessionId: string

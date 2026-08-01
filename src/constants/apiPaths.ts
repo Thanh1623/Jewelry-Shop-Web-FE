@@ -9,4 +9,5 @@ export const apiPaths = {
     `/chat/sessions/${sessionId}/translate-preview`,
   advisorAsk: "/advisor/ask",
   craftsmanAsk: "/webhooks/craftsman/ask",
+  uploadImage: "/uploads/image",
 } as const

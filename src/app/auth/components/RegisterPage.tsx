@@ -1,16 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Link, useSearchParams } from "react-router-dom"
 import { useForm } from "react-hook-form"
-import { Link } from "react-router-dom"
 
 import { useRegisterMutation } from "@/app/auth/hooks/use-auth-mutations"
-import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  registerDefaultValues,
+  registerSchema,
+  type RegisterFormInput,
+} from "@/app/auth/schemas/register.schema"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -21,14 +20,14 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { urlPaths } from "@/constants/urlPaths"
-import {
-  registerDefaultValues,
-  registerSchema,
-  type RegisterFormInput,
-} from "../schemas/register.schema"
 
 export function RegisterPage() {
+  const [searchParams] = useSearchParams()
+  const productId = searchParams.get("productId")
   const registerMutation = useRegisterMutation()
+  const loginHref = productId
+    ? `${urlPaths.login}?productId=${productId}`
+    : urlPaths.login
 
   const form = useForm<RegisterFormInput>({
     resolver: zodResolver(registerSchema),
@@ -36,59 +35,27 @@ export function RegisterPage() {
   })
 
   function onSubmit(values: RegisterFormInput) {
-    registerMutation.mutate(values)
+    registerMutation.mutate({
+      fullName: values.fullName,
+      email: values.email,
+      phone: values.phone,
+      password: values.password,
+    })
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Đăng nhập</CardTitle>
-        <CardDescription>Nhập email và mật khẩu để tiếp tục.</CardDescription>
+    <Card className="border-border shadow-none">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg">Đăng ký khách hàng</CardTitle>
+        {productId && (
+          <p className="text-xs text-muted-foreground">
+            Tạo tài khoản để hỏi giá sản phẩm.
+          </p>
+        )}
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      autoComplete="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••"
-                      autoComplete="current-password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
             <FormField
               control={form.control}
               name="fullName"
@@ -96,9 +63,23 @@ export function RegisterPage() {
                 <FormItem>
                   <FormLabel>Họ tên</FormLabel>
                   <FormControl>
+                    <Input autoComplete="name" placeholder="Nguyễn Văn A" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Số điện thoại</FormLabel>
+                  <FormControl>
                     <Input
-                      placeholder="Nguyen Van A"
-                      autoComplete="name"
+                      type="tel"
+                      autoComplete="tel"
+                      placeholder="0901234567"
                       {...field}
                     />
                   </FormControl>
@@ -106,16 +87,44 @@ export function RegisterPage() {
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" autoComplete="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mật khẩu</FormLabel>
+                  <FormControl>
+                    <Input type="password" autoComplete="new-password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" disabled={registerMutation.isPending}>
               {registerMutation.isPending ? "Đang đăng ký..." : "Đăng ký"}
             </Button>
           </form>
         </Form>
 
-        <Button asChild variant="link" className="mt-4 px-0">
-          <Link to={urlPaths.register}>Chưa có tài khoản? Đăng ký</Link>
-        </Button>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Đã có tài khoản?{" "}
+          <Link to={loginHref} className="text-foreground underline">
+            Đăng nhập
+          </Link>
+        </p>
       </CardContent>
     </Card>
   )

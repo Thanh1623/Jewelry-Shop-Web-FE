@@ -10,53 +10,57 @@ export function SaleDashboardPage() {
   const sessionsQuery = useQuery(openChatSessionsQueryOptions())
 
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h1 className="font-heading text-2xl font-semibold">Phiên trò chuyện</h1>
-        <p className="text-muted-foreground">Chọn một phiên để tư vấn khách hàng.</p>
-      </div>
+    <div className="flex flex-col gap-3">
+      <h1 className="text-base font-semibold">Phiên tư vấn</h1>
 
       {sessionsQuery.isPending && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-16 w-full rounded-2xl" />
+            <Skeleton key={index} className="h-12 w-full" />
           ))}
         </div>
       )}
 
       {sessionsQuery.isError && (
-        <p className="text-sm text-destructive">Không thể tải danh sách phiên trò chuyện.</p>
+        <p className="text-sm text-destructive">Không tải được danh sách phiên.</p>
       )}
 
       {sessionsQuery.data?.length === 0 && (
-        <p className="text-sm text-muted-foreground">Chưa có phiên trò chuyện nào đang mở.</p>
+        <p className="text-sm text-muted-foreground">Chưa có phiên đang mở.</p>
       )}
 
       {!!sessionsQuery.data?.length && (
-        <ul className="flex flex-col divide-y divide-border/60 overflow-hidden rounded-3xl ring-1 ring-border/60">
+        <ul className="divide-y divide-border border border-border bg-card">
           {sessionsQuery.data.map((session) => (
             <li key={session.id}>
               <Link
                 to={urlPaths.saleSessionDetail(session.id)}
-                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-muted/50"
+                className="flex items-center gap-2 px-3 py-2 hover:bg-muted/50"
               >
-                {session.product?.imageUrl && (
+                {session.product?.imageUrl ? (
                   <img
                     src={session.product.imageUrl}
                     alt={session.product.name}
-                    className="size-10 shrink-0 rounded-xl object-cover"
+                    className="size-9 shrink-0 object-cover"
                   />
+                ) : (
+                  <div className="size-9 shrink-0 bg-muted" />
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium">
-                    {session.guestName ?? "Khách"} · {session.product?.name ?? "Chưa gắn sản phẩm"}
+                  <p className="truncate text-sm font-medium">
+                    {session.customer?.fullName ?? session.guestName ?? "Khách"} ·{" "}
+                    {session.product?.name ?? "—"}
                   </p>
-                  <p className="truncate text-sm text-muted-foreground">
-                    {session.lastMessage?.content ?? "Chưa có tin nhắn"}
+                  <p className="truncate text-xs text-muted-foreground">
+                    {[session.customer?.phone, session.customer?.email]
+                      .filter(Boolean)
+                      .join(" · ") ||
+                      session.lastMessage?.content ||
+                      "Chưa có tin nhắn"}
                   </p>
                 </div>
-                <Badge variant={session.isOpen ? "default" : "outline"}>
-                  {session.isOpen ? "Đang mở" : "Đã đóng"}
+                <Badge variant={session.isOpen ? "default" : "outline"} className="text-[10px]">
+                  {session.isOpen ? "Mở" : "Đóng"}
                 </Badge>
               </Link>
             </li>

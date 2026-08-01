@@ -102,7 +102,7 @@ export function MessageComposer({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-2 border-t border-border/60 p-3"
+        className="flex flex-col gap-1.5 border-t border-border p-2"
       >
         <div className="flex items-end gap-2">
           <FormField

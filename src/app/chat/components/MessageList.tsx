@@ -18,14 +18,12 @@ export function MessageList({ messages, viewerRole, onUseAsDraft }: MessageListP
 
   if (messages.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-muted-foreground">
-        Chưa có tin nhắn nào. Hãy bắt đầu trò chuyện!
-      </p>
+      <p className="py-4 text-center text-xs text-muted-foreground">Chưa có tin nhắn.</p>
     )
   }
 
   return (
-    <div className="flex flex-col gap-3 overflow-y-auto p-4">
+    <div className="flex flex-col gap-2 overflow-y-auto p-2.5">
       {messages.map((message) => (
         <MessageBubble
           key={message.id}
