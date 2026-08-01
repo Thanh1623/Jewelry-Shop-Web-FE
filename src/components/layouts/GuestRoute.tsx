@@ -8,7 +8,12 @@ export function GuestRoute() {
   const user = useAuthStore((state) => state.user)
 
   if (accessToken) {
-    const redirectTo = user?.role === "SALE" ? urlPaths.saleDashboard : urlPaths.home
+    const redirectTo =
+      user?.role === "SALE"
+        ? urlPaths.saleDashboard
+        : user?.role === "ADMIN"
+          ? urlPaths.adminProducts
+          : urlPaths.home
     return <Navigate to={redirectTo} replace />
   }
 

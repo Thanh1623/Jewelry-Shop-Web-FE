@@ -34,10 +34,21 @@ export function ChatSessionPage() {
       </div>
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto">
-          <MessageList messages={session.messages} viewerRole="customer" />
+          <MessageList
+            messages={session.messages}
+            viewerRole="customer"
+            customerVisibleOnly
+            emptyText="Chưa có tin nhắn. Hãy hỏi giá sản phẩm."
+          />
         </div>
         <MessageComposer
-          onSend={(content) => sendMessageMutation.mutate(content)}
+          allowImage
+          onSend={(payload) =>
+            sendMessageMutation.mutate({
+              content: payload.content,
+              imageUrl: payload.imageUrl,
+            })
+          }
           isSending={sendMessageMutation.isPending}
           disabled={!session.isOpen}
         />

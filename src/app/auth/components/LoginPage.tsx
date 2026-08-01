@@ -96,6 +96,7 @@ export function LoginPage() {
           <div className="mt-2 space-y-0.5 text-xs text-muted-foreground">
             <p>Demo khách: customer@jewelry.local / Customer123456!</p>
             <p>Demo sale: sale@jewelry.local / Sale123456!</p>
+            <p>Demo admin: admin@jewelry.local / Admin123456!</p>
           </div>
         )}
       </CardContent>

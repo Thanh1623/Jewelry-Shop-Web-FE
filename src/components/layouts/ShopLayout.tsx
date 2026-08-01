@@ -1,15 +1,26 @@
 import { Link, Outlet, useLocation } from "react-router-dom"
 
+import { logoutRequest } from "@/app/auth/services/auth.service"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { urlPaths } from "@/constants/urlPaths"
-import { useAuthStore } from "@/stores/auth-store"
+import { getRefreshToken, useAuthStore } from "@/stores/auth-store"
 
 export function ShopLayout() {
   const { pathname } = useLocation()
   const isHome = pathname === urlPaths.home
   const user = useAuthStore((state) => state.user)
   const logout = useAuthStore((state) => state.logout)
+
+  async function handleLogout() {
+    const refreshToken = getRefreshToken()
+    try {
+      await logoutRequest(refreshToken)
+    } catch {
+      // ignore network errors on logout
+    }
+    logout()
+  }
 
   return (
     <div className="min-h-svh">
@@ -31,11 +42,44 @@ export function ShopLayout() {
           >
             BẠC Ý
           </Link>
-          <nav className="flex items-center gap-4 text-xs tracking-wide sm:gap-5">
+          <nav className="flex items-center gap-3 text-xs tracking-wide sm:gap-5">
             {isHome && (
               <a href="#bo-suu-tap" className="hidden text-white/80 transition hover:text-white sm:inline">
                 Bộ sưu tập
               </a>
+            )}
+            {(user?.role === "CUSTOMER" || user?.role === "ADMIN") && (
+              <>
+                <Link
+                  to={urlPaths.cart}
+                  className={cn(
+                    "transition hover:opacity-80",
+                    isHome ? "text-white/80" : "text-muted-foreground"
+                  )}
+                >
+                  Giỏ
+                </Link>
+                <Link
+                  to={urlPaths.orders}
+                  className={cn(
+                    "hidden transition hover:opacity-80 sm:inline",
+                    isHome ? "text-white/80" : "text-muted-foreground"
+                  )}
+                >
+                  Đơn
+                </Link>
+              </>
+            )}
+            {user?.role === "ADMIN" && (
+              <Link
+                to={urlPaths.adminProducts}
+                className={cn(
+                  "transition hover:opacity-80",
+                  isHome ? "text-white/80" : "text-muted-foreground"
+                )}
+              >
+                Admin
+              </Link>
             )}
             {user?.role === "SALE" && (
               <Link
@@ -66,7 +110,7 @@ export function ShopLayout() {
                     isHome &&
                       "border-white/50 bg-transparent text-white hover:bg-white/10 hover:text-white"
                   )}
-                  onClick={logout}
+                  onClick={handleLogout}
                 >
                   Đăng xuất
                 </Button>

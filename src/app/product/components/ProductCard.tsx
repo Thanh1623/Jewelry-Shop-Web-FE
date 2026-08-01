@@ -6,14 +6,18 @@ import type { Product } from "../types/product.types"
 interface ProductCardProps {
   product: Product
   onChatClick: (product: Product) => void
+  onAddToCart?: (product: Product) => void
   isStarting?: boolean
+  isAddingToCart?: boolean
   index?: number
 }
 
 export function ProductCard({
   product,
   onChatClick,
+  onAddToCart,
   isStarting,
+  isAddingToCart,
   index = 0,
 }: ProductCardProps) {
   const [imageFailed, setImageFailed] = useState(false)
@@ -48,11 +52,21 @@ export function ProductCard({
           {isStarting ? "Đang mở..." : "Hỏi giá"}
         </span>
       </button>
-      <div className="mt-3 space-y-0.5">
+      <div className="mt-3 space-y-1">
         <h3 className="line-clamp-1 text-sm tracking-wide">{product.name}</h3>
         <p className="text-xs text-muted-foreground">
           {product.weightGrams}g · Công {formatVnd(product.laborCost)}
         </p>
+        {onAddToCart && (
+          <button
+            type="button"
+            disabled={isAddingToCart}
+            onClick={() => onAddToCart(product)}
+            className="text-[11px] tracking-[0.16em] text-foreground/80 uppercase underline-offset-4 hover:underline disabled:opacity-50"
+          >
+            {isAddingToCart ? "Đang thêm..." : "Thêm giỏ"}
+          </button>
+        )}
       </div>
     </article>
   )

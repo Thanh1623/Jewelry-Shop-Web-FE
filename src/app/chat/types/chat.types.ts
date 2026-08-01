@@ -13,6 +13,8 @@ export interface MessageI18nMeta {
 
 export interface ChatMessageMeta {
   i18n?: MessageI18nMeta
+  internalLane?: "AI" | "CRAFTSMAN"
+  imageUrl?: string
   [key: string]: unknown
 }
 
@@ -80,6 +82,7 @@ export type HumanMessageSender = Extract<MessageSender, "CUSTOMER" | "SALE">
 export interface SendMessagePayload {
   content: string
   sender: HumanMessageSender
+  imageUrl?: string
 }
 
 export interface TranslatePreviewResponse {

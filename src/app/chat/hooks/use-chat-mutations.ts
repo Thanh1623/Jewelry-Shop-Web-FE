@@ -10,6 +10,7 @@ import type {
   ChatSessionDetail,
   CreateSessionPayload,
   HumanMessageSender,
+  SendMessagePayload,
 } from "../types/chat.types"
 import { appendMessageToSession } from "../utils/append-message"
 import { chatKeys } from "../queries/chat.keys"
@@ -34,8 +35,8 @@ export function useSendMessageMutation(sessionId: string, sender: HumanMessageSe
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (content: string) =>
-      postMessageRequest(sessionId, { content, sender }),
+    mutationFn: (payload: Pick<SendMessagePayload, "content" | "imageUrl">) =>
+      postMessageRequest(sessionId, { ...payload, sender }),
     onSuccess: (message) => {
       queryClient.setQueryData(chatKeys.session(sessionId), (old: ChatSessionDetail | undefined) =>
         appendMessageToSession(old, message)

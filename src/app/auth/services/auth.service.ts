@@ -1,4 +1,5 @@
 import { httpService } from "@/services/httpService"
+import { apiPaths } from "@/constants/apiPaths"
 
 import type {
   AuthResponse,
@@ -6,7 +7,6 @@ import type {
   LoginPayload,
   RegisterPayload,
 } from "../types/auth.types"
-import { apiPaths } from "@/constants/apiPaths"
 
 export async function loginRequest(
   payload: LoginPayload
@@ -26,6 +26,20 @@ export async function registerRequest(
     payload
   )
   return data
+}
+
+export async function refreshRequest(
+  refreshToken: string
+): Promise<AuthResponse> {
+  const { data } = await httpService.post<AuthResponse>(
+    `${apiPaths.auth}/refresh`,
+    { refreshToken }
+  )
+  return data
+}
+
+export async function logoutRequest(refreshToken?: string | null): Promise<void> {
+  await httpService.post(`${apiPaths.auth}/logout`, { refreshToken: refreshToken ?? undefined })
 }
 
 export async function fetchMeRequest(): Promise<AuthUser> {

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { HammerIcon, ImagePlusIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -122,32 +123,39 @@ export function AskCraftsmanDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] gap-5 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
+          <div className="mb-1 flex size-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+            <HammerIcon className="size-5" />
+          </div>
           <DialogTitle>Gửi yêu cầu cho thợ</DialogTitle>
-          <DialogDescription>Câu hỏi, ghi chú và ảnh tham chiếu (nếu có).</DialogDescription>
+          <DialogDescription>
+            Form đầy đủ — câu hỏi, ghi chú và ảnh tham chiếu gửi sang xưởng.
+          </DialogDescription>
         </DialogHeader>
 
         {product && (
-          <div className="flex gap-3 border border-border bg-muted/40 p-3">
+          <div className="flex gap-3 rounded-2xl border border-orange-100 bg-orange-50/40 p-3">
             {product.imageUrl ? (
               <img
                 src={product.imageUrl}
                 alt={product.name}
-                className="size-20 shrink-0 object-cover"
+                className="size-16 shrink-0 rounded-xl object-cover ring-1 ring-black/5"
               />
             ) : (
-              <div className="metal-sheen flex size-20 shrink-0 items-center justify-center text-xs text-slate-600">
+              <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-white text-xs text-slate-500 ring-1 ring-slate-200">
                 SP
               </div>
             )}
             <div className="min-w-0 text-sm">
-              <p className="font-medium">{product.name}</p>
-              <p className="text-muted-foreground">
+              <p className="font-semibold text-slate-800">{product.name}</p>
+              <p className="mt-0.5 text-xs text-slate-500">
                 {product.weightGrams}g · Công {product.laborCost.toLocaleString("vi-VN")}đ · Size{" "}
                 {product.baseSize}
               </p>
-              <p className="mt-1 line-clamp-2 text-muted-foreground">{product.description}</p>
+              {product.description && (
+                <p className="mt-1 line-clamp-2 text-xs text-slate-500">{product.description}</p>
+              )}
             </div>
           </div>
         )}
@@ -159,10 +167,10 @@ export function AskCraftsmanDialog({
               name="question"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Câu hỏi gửi thợ</FormLabel>
+                  <FormLabel className="text-xs text-slate-600">Câu hỏi gửi thợ</FormLabel>
                   <FormControl>
                     <Textarea
-                      className="min-h-24"
+                      className="min-h-24 rounded-xl border-slate-200 bg-slate-50/60"
                       placeholder="Ví dụ: Size 6 có làm được không? Thời gian bao lâu?"
                       {...field}
                     />
@@ -177,10 +185,12 @@ export function AskCraftsmanDialog({
               name="customerNote"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mô tả / ghi chú thêm (tuỳ chọn)</FormLabel>
+                  <FormLabel className="text-xs text-slate-600">
+                    Ghi chú thêm <span className="font-normal text-slate-400">(tuỳ chọn)</span>
+                  </FormLabel>
                   <FormControl>
                     <Textarea
-                      className="min-h-20"
+                      className="min-h-20 rounded-xl border-slate-200 bg-slate-50/60"
                       placeholder="Ví dụ: Khách muốn bản bóng gương, giao trước cuối tuần..."
                       {...field}
                     />
@@ -195,29 +205,34 @@ export function AskCraftsmanDialog({
               name="referenceImageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ảnh tham chiếu (tuỳ chọn)</FormLabel>
+                  <FormLabel className="text-xs text-slate-600">
+                    Ảnh tham chiếu <span className="font-normal text-slate-400">(tuỳ chọn)</span>
+                  </FormLabel>
                   <FormControl>
                     <div className="flex flex-col gap-2">
                       <Input
                         type="url"
-                        placeholder="Dán URL ảnh tham chiếu..."
+                        placeholder="Dán URL ảnh…"
+                        className="h-10 rounded-xl border-slate-200"
                         value={field.value ?? ""}
                         onChange={(event) => {
                           setReferencePreview(event.target.value || null)
                           field.onChange(event.target.value)
                         }}
                       />
-                      <Input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        disabled={isUploading || isSubmitting}
-                        onChange={(event) => {
-                          void handleReferenceFile(event.target.files?.[0])
-                        }}
-                      />
-                      {isUploading && (
-                        <p className="text-xs text-muted-foreground">Đang tải ảnh lên server...</p>
-                      )}
+                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-dashed border-slate-200 bg-slate-50/80 px-3 py-2.5 text-xs text-slate-600 transition hover:border-orange-200 hover:bg-orange-50/50">
+                        <ImagePlusIcon className="size-4 text-orange-500" />
+                        {isUploading ? "Đang tải ảnh…" : "Hoặc chọn ảnh từ máy"}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          disabled={isUploading || isSubmitting}
+                          onChange={(event) => {
+                            void handleReferenceFile(event.target.files?.[0])
+                          }}
+                        />
+                      </label>
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -226,16 +241,24 @@ export function AskCraftsmanDialog({
             />
 
             {(referencePreview || product?.imageUrl) && (
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2.5">
                 {product?.imageUrl && (
-                  <div className="overflow-hidden border border-border">
-                    <p className="bg-muted px-2 py-1 text-[11px] text-muted-foreground">Ảnh SP</p>
-                    <img src={product.imageUrl} alt="Sản phẩm" className="aspect-square w-full object-cover" />
+                  <div className="overflow-hidden rounded-xl ring-1 ring-slate-200/80">
+                    <p className="bg-slate-50 px-2.5 py-1 text-[10px] font-medium tracking-wide text-slate-500 uppercase">
+                      Ảnh SP
+                    </p>
+                    <img
+                      src={product.imageUrl}
+                      alt="Sản phẩm"
+                      className="aspect-square w-full object-cover"
+                    />
                   </div>
                 )}
                 {referencePreview && (
-                  <div className="overflow-hidden border border-border">
-                    <p className="bg-muted px-2 py-1 text-[11px] text-muted-foreground">Tham chiếu</p>
+                  <div className="overflow-hidden rounded-xl ring-1 ring-orange-100">
+                    <p className="bg-orange-50 px-2.5 py-1 text-[10px] font-medium tracking-wide text-orange-700/80 uppercase">
+                      Tham chiếu
+                    </p>
                     <img
                       src={referencePreview}
                       alt="Tham chiếu"
@@ -246,12 +269,21 @@ export function AskCraftsmanDialog({
               </div>
             )}
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <DialogFooter className="gap-2 pt-1 sm:gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10 rounded-full border-slate-200"
+                onClick={() => onOpenChange(false)}
+              >
                 Huỷ
               </Button>
-              <Button type="submit" disabled={isSubmitting || isUploading}>
-                {isSubmitting ? "Đang gửi..." : "Gửi cho thợ"}
+              <Button
+                type="submit"
+                disabled={isSubmitting || isUploading}
+                className="h-10 rounded-full bg-orange-500 text-white hover:bg-orange-600"
+              >
+                {isSubmitting ? "Đang gửi…" : "Gửi cho thợ"}
               </Button>
             </DialogFooter>
           </form>

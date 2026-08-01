@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 
+import { useUpsertCartItemMutation } from "@/app/cart/hooks/use-cart-mutations"
 import { useCreateSessionMutation } from "@/app/chat/hooks/use-chat-mutations"
 import { Skeleton } from "@/components/ui/skeleton"
 import { urlPaths } from "@/constants/urlPaths"
@@ -18,6 +19,7 @@ export function ShopHomePage() {
   const user = useAuthStore((state) => state.user)
   const productsQuery = useQuery(productsQueryOptions())
   const createSessionMutation = useCreateSessionMutation()
+  const addToCartMutation = useUpsertCartItemMutation()
 
   function handleChatClick(product: Product) {
     if (!user || user.role !== "CUSTOMER") {
@@ -25,6 +27,14 @@ export function ShopHomePage() {
       return
     }
     createSessionMutation.mutate({ productId: product.id })
+  }
+
+  function handleAddToCart(product: Product) {
+    if (!user || (user.role !== "CUSTOMER" && user.role !== "ADMIN")) {
+      navigate(urlPaths.login)
+      return
+    }
+    addToCartMutation.mutate({ productId: product.id, quantity: 1 })
   }
 
   return (
@@ -98,7 +108,9 @@ export function ShopHomePage() {
                   key={product.id}
                   product={product}
                   onChatClick={handleChatClick}
+                  onAddToCart={handleAddToCart}
                   isStarting={createSessionMutation.isPending}
+                  isAddingToCart={addToCartMutation.isPending}
                   index={index}
                 />
               ))}

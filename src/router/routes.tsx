@@ -2,7 +2,11 @@ import { createBrowserRouter, Navigate } from "react-router-dom"
 
 import { LoginPage } from "@/app/auth/components/LoginPage"
 import { RegisterPage } from "@/app/auth/components/RegisterPage"
+import { CartPage } from "@/app/cart/components/CartPage"
+import { OrderDetailPage } from "@/app/cart/components/OrderDetailPage"
+import { OrdersPage } from "@/app/cart/components/OrdersPage"
 import { ChatSessionPage } from "@/app/chat/components/ChatSessionPage"
+import { AdminProductsPage } from "@/app/product/components/AdminProductsPage"
 import { ShopHomePage } from "@/app/product/components/ShopHomePage"
 import { SaleDashboardPage } from "@/app/sale/components/SaleDashboardPage"
 import { SaleSessionDetailPage } from "@/app/sale/components/SaleSessionDetailPage"
@@ -19,6 +23,18 @@ export const router = createBrowserRouter([
     children: [
       { path: urlPaths.home, element: <ShopHomePage /> },
       { path: "/chat/:sessionId", element: <ChatSessionPage /> },
+      {
+        element: <ProtectedRoute allowedRoles={["CUSTOMER", "ADMIN"]} />,
+        children: [
+          { path: urlPaths.cart, element: <CartPage /> },
+          { path: urlPaths.orders, element: <OrdersPage /> },
+          { path: "/orders/:orderId", element: <OrderDetailPage /> },
+        ],
+      },
+      {
+        element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
+        children: [{ path: urlPaths.adminProducts, element: <AdminProductsPage /> }],
+      },
     ],
   },
   {

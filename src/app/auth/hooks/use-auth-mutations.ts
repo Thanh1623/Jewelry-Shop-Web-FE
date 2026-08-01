@@ -38,9 +38,13 @@ export function useLoginMutation() {
   return useMutation({
     mutationFn: (payload: LoginPayload) => loginRequest(payload),
     onSuccess: async (data) => {
-      setAuth(data.accessToken, data.user)
+      setAuth(data.accessToken, data.refreshToken, data.user)
       queryClient.setQueryData(authKeys.me(), data.user)
       toast.success("Đăng nhập thành công.")
+      if (data.user.role === "ADMIN") {
+        navigate(urlPaths.adminProducts, { replace: true })
+        return
+      }
       if (data.user.role === "SALE") {
         navigate(urlPaths.saleDashboard, { replace: true })
         return
@@ -63,7 +67,7 @@ export function useRegisterMutation() {
   return useMutation({
     mutationFn: (payload: RegisterPayload) => registerRequest(payload),
     onSuccess: async (data) => {
-      setAuth(data.accessToken, data.user)
+      setAuth(data.accessToken, data.refreshToken, data.user)
       queryClient.setQueryData(authKeys.me(), data.user)
       toast.success("Đăng ký thành công.")
       await continueAfterCustomerAuth(productId, navigate)

@@ -1,4 +1,4 @@
-export type UserRole = "CUSTOMER" | "SALE"
+export type UserRole = "CUSTOMER" | "SALE" | "ADMIN"
 
 export interface AuthUser {
   id: string
@@ -10,6 +10,7 @@ export interface AuthUser {
 
 export interface AuthResponse {
   accessToken: string
+  refreshToken: string
   user: AuthUser
 }
 
