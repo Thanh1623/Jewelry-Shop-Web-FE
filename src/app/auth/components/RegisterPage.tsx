@@ -9,7 +9,6 @@ import {
   type RegisterFormInput,
 } from "@/app/auth/schemas/register.schema"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Form,
   FormControl,
@@ -20,6 +19,10 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { urlPaths } from "@/constants/urlPaths"
+import { cn } from "@/lib/utils"
+
+const fieldClass =
+  "h-11 rounded-none border-[#0f1218]/15 bg-white/70 px-3 text-sm tracking-wide shadow-none focus-visible:border-[#0f1218]/45 focus-visible:ring-[#0f1218]/15"
 
 export function RegisterPage() {
   const [searchParams] = useSearchParams()
@@ -44,88 +47,128 @@ export function RegisterPage() {
   }
 
   return (
-    <Card className="border-border shadow-none">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Đăng ký khách hàng</CardTitle>
-        {productId && (
-          <p className="text-xs text-muted-foreground">
-            Tạo tài khoản để hỏi giá sản phẩm.
-          </p>
-        )}
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-3">
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Họ tên</FormLabel>
-                  <FormControl>
-                    <Input autoComplete="name" placeholder="Nguyễn Văn A" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Số điện thoại</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="tel"
-                      autoComplete="tel"
-                      placeholder="0901234567"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" autoComplete="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Mật khẩu</FormLabel>
-                  <FormControl>
-                    <Input type="password" autoComplete="new-password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" disabled={registerMutation.isPending}>
-              {registerMutation.isPending ? "Đang đăng ký..." : "Đăng ký"}
-            </Button>
-          </form>
-        </Form>
+    <div className="animate-fade-up">
+      <p className="text-[11px] tracking-[0.32em] text-[#0f1218]/45 uppercase">
+        Membership
+      </p>
+      <h1 className="mt-2 text-4xl font-light tracking-[0.08em] text-[#0f1218] sm:text-5xl">
+        Đăng ký
+      </h1>
+      <p className="mt-3 max-w-sm text-sm leading-relaxed text-[#0f1218]/55">
+        {productId
+          ? "Tạo tài khoản khách để hỏi giá và nhận tư vấn chế tác."
+          : "Trở thành khách hàng Bạc Ý — tư vấn realtime và theo dõi đơn."}
+      </p>
 
-        <p className="mt-3 text-xs text-muted-foreground">
-          Đã có tài khoản?{" "}
-          <Link to={loginHref} className="text-foreground underline">
-            Đăng nhập
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mt-9 flex flex-col gap-5"
+        >
+          <FormField
+            control={form.control}
+            name="fullName"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className="text-[11px] font-normal tracking-[0.2em] text-[#0f1218]/55 uppercase">
+                  Họ tên
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    autoComplete="name"
+                    placeholder="Nguyễn Văn A"
+                    className={fieldClass}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className="text-[11px] font-normal tracking-[0.2em] text-[#0f1218]/55 uppercase">
+                  Số điện thoại
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="0901234567"
+                    className={fieldClass}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className="text-[11px] font-normal tracking-[0.2em] text-[#0f1218]/55 uppercase">
+                  Email
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    autoComplete="email"
+                    className={fieldClass}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className="text-[11px] font-normal tracking-[0.2em] text-[#0f1218]/55 uppercase">
+                  Mật khẩu
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="password"
+                    autoComplete="new-password"
+                    className={fieldClass}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <Button
+            type="submit"
+            disabled={registerMutation.isPending}
+            className={cn(
+              "mt-2 h-12 rounded-none bg-[#0f1218] text-xs tracking-[0.22em] text-white uppercase",
+              "hover:bg-[#0f1218]/90"
+            )}
+          >
+            {registerMutation.isPending ? "Đang đăng ký..." : "Tạo tài khoản"}
+          </Button>
+        </form>
+      </Form>
+
+      <p className="mt-8 text-sm text-[#0f1218]/55">
+        Đã có tài khoản?{" "}
+        <Link
+          to={loginHref}
+          className="tracking-wide text-[#0f1218] underline underline-offset-4 transition hover:opacity-70"
+        >
+          Đăng nhập
+        </Link>
+      </p>
+    </div>
   )
 }
